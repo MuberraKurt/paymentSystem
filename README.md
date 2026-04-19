@@ -1,51 +1,66 @@
-# Payment System (SOLID - OCP & SRP)
+# Payment System (SOLID: SRP & OCP)
 
-This project demonstrates how to integrate a new payment method into a simple payment flow using **SOLID principles**, especially **SRP** and **OCP**.
+This project implements a simple payment flow and demonstrates how to add new payment methods with minimal impact on existing code.
 
-## Goal
+## Project Objective
 
-- Extend the system with a new payment method without breaking existing structure
-- Keep responsibilities clear and isolated
+- Keep the existing structure stable
+- Add new payment methods in a SOLID-friendly way
+- Focus on:
+  - **SRP (Single Responsibility Principle)**
+  - **OCP (Open/Closed Principle)**
 
-## Architecture
+## Simple Payment Flow
 
-- `PaymentController`: receives payment requests and starts the flow
-- `PaymentManager`: handles payment process orchestration
-- `PaymentMethod` (interface): common contract for all payment methods
-- `PaymentFactory`: creates the correct `PaymentMethod` by payment type
-- `PaymentRequest`: carries payment data (`type`, `amount`)
+`Application` creates a payment request and sends it through:
 
-## Payment Methods
+1. `PaymentController`
+2. `PaymentManager`
+3. `PaymentFactory`
+4. `PaymentMethod` implementation (`CreditCardPayment`, `PayPalPayment`, etc.)
 
-- Existing method: `CreditCardPayment`
-- Newly added method: `PayPalPayment`
-- (Optional extension) `ApplePayPayment`
+## Core Components
 
-## SOLID Decisions
+- `PaymentController`  
+  Accepts incoming payment requests and triggers the payment process.
 
-### SRP (Single Responsibility Principle)
-Each class has one clear responsibility:
-- Controller routes requests
-- Manager coordinates the process
+- `PaymentManager`  
+  Coordinates payment execution using a `PaymentMethod`.
+
+- `PaymentMethod` (interface)  
+  Defines the common contract for all payment methods.
+
+- `PaymentFactory`  
+  Creates the correct payment strategy according to payment type.
+
+- `PaymentRequest`  
+  Carries input data (`type`, `amount`).
+
+## Implemented Payment Methods
+
+- Existing: `CreditCardPayment`
+- Added: `PayPalPayment`
+- Optional extension: `ApplePayPayment`
+
+## SOLID Design Notes
+
+### SRP
+Each class has one focused responsibility:
+- Controller handles request routing
+- Manager handles process orchestration
 - Factory handles object creation
-- Payment classes implement only their own payment logic
+- Payment classes handle payment-specific behavior
 
-### OCP (Open/Closed Principle)
+### OCP
 The system is open for extension via new `PaymentMethod` implementations.  
-New methods can be added with minimal changes to existing flow.
+New payment methods can be added without changing the payment flow (`Controller`/`Manager`).
 
-## Run
+## Reflection + Properties (Optional Advanced Extension)
 
-Use `Application` as the entry point to test:
-- `creditcard`
-- `paypal`
-- (optional) `applepay`
+For better scalability, `PaymentFactory` can load payment class mappings from `payment.properties` and instantiate them with reflection.
 
-## Extending the System
+Example:
 
-To add a new payment method:
-1. Create a class implementing `PaymentMethod`
-2. Register/add it in `PaymentFactory`
-3. Test it from `Application`
-
-This design keeps the codebase simple, maintainable, and scalable for future payment integrations.
+```properties
+creditcard=main.core.CreditCardPayment
+paypal=main.core.PayPalPayment
